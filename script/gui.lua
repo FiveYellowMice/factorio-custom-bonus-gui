@@ -91,6 +91,8 @@ function gui.refresh(player)
 
     local bonuses = custom_bonus.get_player_merged_bonuses(player)
 
+    frame.visible = next(bonuses) ~= nil
+
     for _, bonus in pairs(bonuses) do
         local card = table.add{
             type = "frame",

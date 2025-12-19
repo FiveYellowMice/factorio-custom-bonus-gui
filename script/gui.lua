@@ -107,25 +107,13 @@ function gui.refresh(player)
         }
 
         for _, bonus_icon in ipairs(bonus.icons) do
-            local elem_params = {
-                type = "choose-elem-button",
-                style = constants.style_prefix.."icon_slot",
-                enabled = false,
-            }--[[@as LuaGuiElement.add_param.base]]
-
-            ---@cast elem_params LuaGuiElement.add_param.choose_elem_button
-            if bonus_icon.type == "virtual-signal" then
-                elem_params.elem_type = "signal"
-                elem_params.signal = {
-                    type = "virtual",
-                    name = bonus_icon.name,
-                }
-            else
-                elem_params.elem_type = bonus_icon.type--[[@as ElemType]]
-                elem_params[bonus_icon.type] = bonus_icon.name
-            end
-
-            icon_table.add(elem_params)
+            icon_table.add{
+                type = "sprite-button",
+                style = "transparent_slot",
+                game_controller_interaction = defines.game_controller_interaction.never,
+                sprite = custom_bonus.icon_to_sprite_path(bonus_icon),
+                elem_tooltip = custom_bonus.icon_to_elem_id(bonus_icon),
+            }
         end
 
         --- Texts

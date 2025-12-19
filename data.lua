@@ -13,9 +13,3 @@ styles[constants.style_prefix.."table"] = {
     vertical_spacing = 0,
     vertically_stretchable = "off",
 }
-
-styles[constants.style_prefix.."icon_slot"] = {
-    type = "button_style",
-    parent = "transparent_slot",
-    disabled_graphical_set = {},
-}

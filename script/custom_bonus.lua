@@ -12,6 +12,7 @@ local custom_bonus = {}
 
 ---@enum (key) CustomBonus.IconType
 custom_bonus.valid_icon_types = {
+    ["sprite"] = true,
     ["item"] = true,
     ["tile"] = true,
     ["entity"] = true,
@@ -136,6 +137,32 @@ function custom_bonus.get_player_merged_bonuses(player)
         end
     end
     return merged
+end
+
+---@param icon CustomBonus.Icon
+---@return SpritePath
+function custom_bonus.icon_to_sprite_path(icon)
+    if icon.type == "sprite" then
+        return icon.name
+    else
+        return icon.type.."/"..icon.name
+    end
+end
+
+---@param icon CustomBonus.Icon
+---@return ElemID?
+function custom_bonus.icon_to_elem_id(icon)
+    if icon.type == "virtual-signal" then
+        return {
+            type = "signal",
+            name = icon.name,
+            signal_type = "virtual",
+        }
+    elseif icon.type == "sprite" then
+        return nil
+    else
+        return icon--[[@as ElemID]]
+    end
 end
 
 return custom_bonus

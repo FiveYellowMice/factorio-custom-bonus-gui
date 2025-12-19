@@ -55,8 +55,8 @@ function remote_iface.set(target, value)
             local s = {}; for a, _ in pairs(custom_bonus.valid_icon_types) do table.insert(s, a) end
             error("custom-bonus-gui.set: CustomBonus.icons["..i.."].type must be one of: \""..table.concat(s, "\", \"").."\"")
         end
-        if type(icon.name) ~= "string" or not prototypes[string.gsub(icon.type, "-", "_")] then
-            error("custom-bonus-gui.set: CustomBonus.icons["..i.."].name \""..icon.name.."\" does not refer to an existing "..icon.type.." prototype")
+        if type(icon.name) ~= "string" or not helpers.is_valid_sprite_path(custom_bonus.icon_to_sprite_path(icon)) then
+            error("custom-bonus-gui.set: CustomBonus.icons["..i.."].name \""..tostring(icon.name).."\" does not refer to a "..icon.type.." with a valid sprite")
         end
     end
     if type(value.texts) ~= "table" then

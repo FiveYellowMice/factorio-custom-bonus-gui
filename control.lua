@@ -58,3 +58,11 @@ script.on_event(defines.events.on_player_changed_force, function(event)
 
     gui.refresh(player)
 end)
+
+commands.add_command("bonus", {"custom-bonus-gui.bonus-command-help"}, function (data)
+    if not data.player_index then return end
+    local player = game.get_player(data.player_index)
+    if not player then return end
+
+    player.opened = defines.gui_type.bonus
+end)

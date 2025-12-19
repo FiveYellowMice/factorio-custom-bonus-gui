@@ -2,6 +2,7 @@
 
 # This script invokes Lua language server to generate doc/doc.json,
 # then generates a documentation in doc/doc.md.
+# The content of doc/doc.md is to be manually added to README.md.
 
 require 'json'
 
@@ -21,14 +22,14 @@ doc_objs = JSON.load_file("#{PROJECT_PATH}/doc/doc.json")
 RELAVANT_DEFINITIONS.each do |obj_name|
     doc_obj = doc_objs.find{|a| a['name'] == obj_name }
 
-    outfile.print "## #{doc_obj['name']}\n\n"
+    outfile.print "### #{doc_obj['name']}\n\n"
     define = doc_obj['defines'][0] || {}
     outfile.print "#{define['desc']}\n\n" if define['desc']
 
     doc_obj['fields'].sort_by{|f| f['start']}.each do |field|
 
         if field['extends'] && field['extends']['type'] == 'function'
-            outfile.print "### #{field['name']}\n\n"
+            outfile.print "#### #{field['name']}\n\n"
 
             args = field['extends']['args'] || []
             returns = field['extends']['returns'] || []

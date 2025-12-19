@@ -1,7 +1,7 @@
 local custom_bonus = {}
 
 ---@class (exact) CustomBonus
----@field name string The internal name of the bonus. Must be unique across all mods.<br>Setting a CustomBonus whose name already exists overrides the previous one.
+---@field name string The internal name of the bonus. Must be unique across all mods. Setting a custom bonus whose name already exists for the same target overwrites the previous one.
 ---@field mod_name string The mod owning this bonus. The bonus will be removed when the mod is removed.
 ---@field icons CustomBonus.Icon[] Icons to display.
 ---@field texts LocalisedString[] Text labels to display.
@@ -37,8 +37,11 @@ custom_bonus.valid_scopes = {
 
 
 function custom_bonus.on_init()
+    ---@package
     ---@type CustomBonusStorage
     storage.force_bonuses = {}
+
+    ---@package
     ---@type CustomBonusStorage
     storage.player_bonuses = {}
 end

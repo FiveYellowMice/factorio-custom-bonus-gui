@@ -2,54 +2,35 @@ local util = require("util")
 local custom_bonus = require("script.custom_bonus")
 local gui = require("script.gui")
 
+---@class remote.custom-bonus-gui
 local remote_iface = {}
 
 ---@param msg_prefix string
----@return CustomBonusScope, uint32, ...
-local function preprocess_args(msg_prefix, scope, index, ...)
-    local args = ... or {}
+---@return CustomBonusScope scope, uint32 index
+local function validate_target(msg_prefix, target)
+    if type(target) ~= "userdata" then goto error end
 
-    if type(scope) == "userdata" then
-        local target = scope--[[@as LuaForce | LuaPlayer]]
-        table.insert(args, 1, index)
-
-        if target.object_name == "LuaForce" then
-            scope = "force"
-            index = target.index
-        elseif target.object_name == "LuaPlayer" then
-            scope = "player"
-            index = target.index
-        else
-            error(msg_prefix..": Target must be a LuaForce or LuaPlayer")
-        end
-
-    else
-        if type(index) ~= "number" then
-            error(msg_prefix..": Index must be a number")
-        end
-        if scope == "force" then
-            if not game.forces[index] then
-                error(msg_prefix..": Force with index "..index.." does not exist")
-            end
-        elseif scope == "player" then
-            if not game.get_player(index) then
-                error(msg_prefix..": Player with index "..index.." does not exist")
-            end
-        else
-            error(msg_prefix..": Scope must be \"force\" or \"player\"")
-        end
+    if target.object_name == "LuaForce" and target.valid then
+        return "force", target.index
+    elseif target.object_name == "LuaPlayer" and target.valid then
+        return "player", target.index
     end
 
-    return scope, index, table.unpack(args)
+    ::error::
+    error(msg_prefix..": Target must be a valid LuaForce or LuaPlayer")
 end
 
----@param scope CustomBonusScope Scope of the custom bonus.
----@param index uint32 Player or force index to set the custom bonus on.
----@param value CustomBonus
----@overload fun(target: LuaForce | LuaPlayer, value: CustomBonus)
-function remote_iface.set(scope, index, value)
-    scope, index, value = preprocess_args("custom-bonus-gui.set", scope, index, value)
-    ---@cast value CustomBonus
+---Set a custom bonus to be displayed.
+---
+---A custom bonus may be attached to a force or a player.
+---* If it is attached to a force, it is visible to all players in the force;
+---* If it is attached to a player, it is visible to them only, and is displayed in favour to the same bonus attached to their force.
+---
+---If a custom bonus with the same name already exists for this target, it is overwritten.
+---@param target LuaForce | LuaPlayer Force or player to attach the custom bonus to.
+---@param value CustomBonus Definitions of the custom bonus.
+function remote_iface.set(target, value)
+    scope, index = validate_target("custom-bonus-gui.set", target)
 
     if type(value) ~= "table" then
         error("custom-bonus-gui.set: Value must be a table")
@@ -89,23 +70,21 @@ function remote_iface.set(scope, index, value)
 
     custom_bonus.set(scope, index, util.table.deepcopy(value))
 
-    if scope == "player" then
-        gui.refresh(game.get_player(index)--[[@as LuaPlayer]])
-    elseif scope == "force" then
-        for _, player in ipairs(game.forces[index].players) do
+    if target.object_name == "LuaPlayer" then
+        gui.refresh(target)
+    elseif target.object_name == "LuaForce" then
+        for _, player in ipairs(target.players) do
             gui.refresh(player)
         end
     end
 end
 
-
----@param scope CustomBonusScope Scope of the custom bonus.
----@param index uint32 Player or force index to get the custom bonus from.
+---Get a copy of a previously set custom bonus.
+---@param target LuaForce | LuaPlayer Force or player to get the custom bonus from.
 ---@param name string Name of the custom bonus.
 ---@return CustomBonus?
----@overload fun(target: LuaForce | LuaPlayer, name: string): CustomBonus?
-function remote_iface.get(scope, index, name)
-    scope, index, name = preprocess_args("custom-bonus-gui.get", scope, index, name)
+function remote_iface.get(target, name)
+    scope, index = validate_target("custom-bonus-gui.get", target)
 
     if type(name) ~= "string" then
         error("custom-bonus-gui.get: Name must be a string")
@@ -114,12 +93,11 @@ function remote_iface.get(scope, index, name)
     return util.table.deepcopy(custom_bonus.get(scope, index, name))
 end
 
----@param scope CustomBonusScope Scope of the custom bonus.
----@param index uint32 Player or force index to remove the custom bonus from.
+---Remove a custom bonus from display. Does nothing if it does not exist.
+---@param target LuaForce | LuaPlayer Force or player to remove the custom bonus from.
 ---@param name string Name of the custom bonus to remove.
----@overload fun(target: LuaForce | LuaPlayer, name: string)
-function remote_iface.remove(scope, index, name)
-    scope, index, name = preprocess_args("custom-bonus-gui.remove", scope, index, name)
+function remote_iface.remove(target, name)
+    scope, index = validate_target("custom-bonus-gui.remove", target)
 
     if type(name) ~= "string" then
         error("custom-bonus-gui.remove: Name must be a string")
@@ -127,10 +105,10 @@ function remote_iface.remove(scope, index, name)
 
     custom_bonus.remove(scope, index, name)
 
-    if scope == "player" then
-        gui.refresh(game.get_player(index)--[[@as LuaPlayer]])
-    elseif scope == "force" then
-        for _, player in ipairs(game.forces[index].players) do
+    if target.object_name == "LuaPlayer" then
+        gui.refresh(target)
+    elseif target.object_name == "LuaForce" then
+        for _, player in ipairs(target.players) do
             gui.refresh(player)
         end
     end

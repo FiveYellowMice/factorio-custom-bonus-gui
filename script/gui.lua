@@ -93,7 +93,7 @@ function gui.refresh(player)
 
     frame.visible = next(bonuses) ~= nil
 
-    for _, bonus in pairs(bonuses) do
+    for _, bonus in ipairs(bonuses) do
         local card = table.add{
             type = "frame",
             style = "bonus_card_frame",

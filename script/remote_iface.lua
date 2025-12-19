@@ -41,6 +41,9 @@ function remote_iface.set(target, value)
     if type(value.mod_name) ~= "string" or not script.active_mods[value.mod_name] then
         error("custom-bonus-gui.set: CustomBonus.mod_name must be the name of an active mod")
     end
+    if type(value.order) ~= "nil" and type(value.order) ~= "string" then
+        error("custom-bonus-gui.set: CustomBonus.order must be nil or a string")
+    end
     if type(value.icons) ~= "table" then
         error("custom-bonus-gui.set: CustomBonus.icons must be an array")
     end

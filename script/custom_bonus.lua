@@ -3,6 +3,7 @@ local custom_bonus = {}
 ---@class (exact) CustomBonus
 ---@field name string The internal name of the bonus. Must be unique across all mods. Setting a custom bonus whose name already exists for the same target overwrites the previous one.
 ---@field mod_name string The mod owning this bonus. The bonus will be removed when the mod is removed.
+---@field order string? String to alphabetically sort the custom bonus with.
 ---@field icons CustomBonus.Icon[] Icons to display.
 ---@field texts LocalisedString[] Text labels to display.
 
@@ -121,21 +122,30 @@ function custom_bonus.remove(scope, index, name)
 end
 
 ---@param player LuaPlayer
----@return table<string, CustomBonus?>
+---@return CustomBonus[]
 function custom_bonus.get_player_merged_bonuses(player)
     local merged = {}
     local force_bonuses = custom_bonus.scope_storages.force--[[@as CustomBonusStorage]][player.force_index]
     if force_bonuses then
         for _, bonus in pairs(force_bonuses) do
-            merged[bonus.name] = bonus
+            table.insert(merged, bonus)
         end
     end
     local player_bonuses = custom_bonus.scope_storages.player--[[@as CustomBonusStorage]][player.index]
     if player_bonuses then
         for _, bonus in pairs(player_bonuses) do
-            merged[bonus.name] = bonus
+            table.insert(merged, bonus)
         end
     end
+    table.sort(merged, function(a, b)
+        local ao = a.order or ""
+        local bo = b.order or ""
+        if ao == bo then
+            return a.name < b.name
+        else
+            return ao < bo
+        end
+    end)
     return merged
 end
 

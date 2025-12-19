@@ -1,8 +1,17 @@
 {
     "name": "custom-bonus-gui",
     "title": "Custom Bonus GUI",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "author": "FiveYellowMice",
+    "homepage": "https://github.com/FiveYellowMice/factorio-custom-bonus-gui",
     "factorio_version": "2.0",
-    "dependencies": []
+    "dependencies": [],
+    "package": {
+        "ignore": [
+            "README.md",
+            "LICENSE",
+            "screenshot.png",
+            "doc/**/*"
+        ]
+    }
 }

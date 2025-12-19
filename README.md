@@ -1,5 +1,7 @@
 # Custom Bonus GUI
 
+[Mod Portal](https://mods.factorio.com/mod/custom-bonus-gui) | [GitHub](https://github.com/FiveYellowMice/factorio-custom-bonus-gui)
+
 This Factorio mod library provides a convient method for mods to display custom bonus cards in the "Bonuses" GUI. Useful for bonuses implemented by scripts.
 
 ## Features
